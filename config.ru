@@ -1,6 +1,4 @@
-require 'bundler'
-require './apps/app.rb'
-
-Bundler.require
+require_relative 'config/environment'
+require_relative 'apps/app'
 
 run CatsShop::App
