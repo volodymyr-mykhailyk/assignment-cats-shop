@@ -1,4 +1,5 @@
 require_relative 'routes/landing'
+require_relative 'routes/cats'
 
 module CatsShop
   class App < Sinatra::Application
@@ -10,5 +11,6 @@ module CatsShop
     end
 
     use CatsShop::Routes::Landing
+    use CatsShop::Routes::Cats
   end
 end
