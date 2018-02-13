@@ -22,7 +22,7 @@ Help us build an automated pipeline for any pull requests that:
 As you work on your solution you will inevitably have questions - please send all inquiries via slack. We are happy to assist and help
 
 ### Tools
-You are free to use any tool, infrastructure you would like. However, it would be nice to see how you can use **AWS** to solve the task.
+You are free to use any tool, infrastructure, technology you would like. However, it would be nice to see how you can use **AWS** to solve the task.
 
 ### Requirements
 
@@ -33,3 +33,15 @@ We would like to see a solution that has following traits:
 - Code - infrastructure/provision/pipelines as a code works the best to: be readable for all engineers, maintain a truth and avoid any hidden manual configurations.
 
   
+### Application commands
+
+- `rackup -p 1234` - Launch web application on port `1234`
+- `rake db:create` - Create db and run migrations
+- `rake db:seeds` - Seed database with basic data
+- `rake db:migrate` - Migrate db to latest version
+- `rspec` - run tests
+
+### Environment variables
+
+- `DATABASE_URL` - url to database e.g `postgres://{user}:{password}@{hostname}:{port}/{database-name}`
+- `RACK_ENV` - environment for the app. possible values: `production`, `development`, `test`
