@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'rack'
+gem 'rake'
 
 gem 'pg', '~> 0.18'
 gem 'activerecord'
