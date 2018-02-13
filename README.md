@@ -43,7 +43,7 @@ Need ruby 2.3.1
 - `rake db:seed` - seed database with basic data
 - `rake db:test:prepare` - setup test database based on dev database schema 
 
-#### Run applicatio
+#### Run application
 - `rackup -p 1234` - Launch web application on port `1234`
 #### Run tests
 - `rspec`
