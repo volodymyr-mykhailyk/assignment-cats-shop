@@ -32,16 +32,21 @@ We would like to see a solution that has following traits:
 - Configuration - how can we adopt a similar solution for other products/flows/technologies?
 - Code - infrastructure/provision/pipelines as a code works the best to: be readable for all engineers, maintain a truth and avoid any hidden manual configurations.
 
-  
-### Application commands
+### Setup and run application
 
+#### Setup
+Need ruby 2.3.1
+- `bundle install` - install dependency
+- Configure database in `config/database.yml` or pass configuraton via `DATABASE_URL` (see section below)
+- `rake db:create` - create db and run migrations
+- `rake db:migrate` - migrate db to latest version
+- `rake db:seed` - seed database with basic data
+- `rake db:test:prepare` - setup test database based on dev database schema 
+
+#### Run applicatio
 - `rackup -p 1234` - Launch web application on port `1234`
-- `rake db:create` - Create db and run migrations
-- `rake db:seeds` - Seed database with basic data
-- `rake db:migrate` - Migrate db to latest version
-- `rspec` - run tests
-
-### Environment variables
-
+#### Run tests
+- `rspec`
+#### Environment variables
 - `DATABASE_URL` - url to database e.g `postgres://{user}:{password}@{hostname}:{port}/{database-name}`
 - `RACK_ENV` - environment for the app. possible values: `production`, `development`, `test`
