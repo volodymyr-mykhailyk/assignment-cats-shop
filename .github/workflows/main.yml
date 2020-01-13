@@ -31,8 +31,10 @@ jobs:
           ruby-version: '2.7.0'
       - name: Set up Bundler
         run: gem install bundler:2.1.4
+      - name: Set up Bundler Cache
+        run: bundle config set path 'vendor/bundle'
       - name: Set up Dependencies
-        run: bundle install --path vendor/bundle
+        run: bundle install
       - name: Set up Database
         run: rake db:setup
 
