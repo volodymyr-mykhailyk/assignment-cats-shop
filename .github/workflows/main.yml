@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.6.x'
-      - name: Install PostgreSQL 11 client
+      - name: Install PostgreSQL dependencies
         run: sudo apt-get -yqq install libpq-dev
       - name: Set up Bundler
         run: |
@@ -38,8 +38,8 @@ jobs:
       - name: Set up Dependencies
         run: bundle install
       - name: Set up Database
-        run: rake db:setup
+        run: bundle exec rake db:setup
 
       - name: Run Unit Tests
-        run: rspec
+        run: bundle exec rspec
 
