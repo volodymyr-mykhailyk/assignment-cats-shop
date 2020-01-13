@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     services:
-      postgres:
+      database:
         image: postgres:12.1-alpine
         ports:
           - '5432:5432'
@@ -37,9 +37,14 @@ jobs:
           bundle config set path 'vendor/bundle'
       - name: Set up Dependencies
         run: bundle install
+
       - name: Set up Database
+        env:
+          DATABASE_URL: postgresql://database:5432
         run: bundle exec rake db:setup
 
       - name: Run Unit Tests
+        env:
+          DATABASE_URL: postgresql://database:5432
         run: bundle exec rspec
 
