@@ -1,0 +1,41 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12.1-alpine
+        ports:
+          - '5432:5432'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.OS }}-ruby-${{ matrix.ruby }}
+          restore-keys: ${{ runner.OS }}-
+
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7.0'
+      - name: Set up Bundler
+        run: gem install bundler:2.1.4
+      - name: Set up Dependencies
+        run: bundle install --path vendor/bundle
+      - name: Set up Database
+        run: rake db:setup
+
+      - name: Run Unit Tests
+        run: rspec
+
