@@ -43,7 +43,7 @@ jobs:
 
       - name: Set up Database
         env:
-          DATABASE_URL: postgresql://app:pass@localhost:5431
+          DATABASE_URL: postgresql://app:pass@localhost:5432
         run: |
           bundle exec rake db:create
           bundle exec rake db:migrate
