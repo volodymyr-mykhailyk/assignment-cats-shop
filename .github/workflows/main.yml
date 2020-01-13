@@ -28,7 +28,7 @@ jobs:
       - name: Set up Ruby
         uses: eregon/use-ruby-action@master
         with:
-          ruby-version: '2.7.x'
+          ruby-version: '2.7.0'
       - name: Set up Bundler
         run: gem install bundler:2.1.4
       - name: Set up Dependencies
