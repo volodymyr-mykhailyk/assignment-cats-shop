@@ -22,17 +22,19 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.OS }}-ruby-${{ matrix.ruby }}
-          restore-keys: ${{ runner.OS }}-
+          key: ${{ runner.OS }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: ${{ runner.OS }}-gems-
 
       - name: Set up Ruby
         uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.6.x'
+      - name: Install PostgreSQL 11 client
+        run: sudo apt-get -yqq install libpq-dev
       - name: Set up Bundler
-        run: gem install bundler:2.1.4
-      - name: Set up Bundler Cache
-        run: bundle config set path 'vendor/bundle'
+        run: |
+          gem install bundler:2.1.4
+          bundle config set path 'vendor/bundle'
       - name: Set up Dependencies
         run: bundle install
       - name: Set up Database
