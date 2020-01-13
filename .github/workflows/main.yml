@@ -26,9 +26,9 @@ jobs:
           restore-keys: ${{ runner.OS }}-
 
       - name: Set up Ruby
-        uses: eregon/use-ruby-action@master
+        uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.7.0'
+          ruby-version: '2.6.x'
       - name: Set up Bundler
         run: gem install bundler:2.1.4
       - name: Set up Bundler Cache
