@@ -40,11 +40,11 @@ jobs:
 
       - name: Set up Database
         env:
-          DATABASE_URL: postgresql://database:5432
+          DATABASE_URL: postgresql://localhost:5432
         run: bundle exec rake db:setup
 
       - name: Run Unit Tests
         env:
-          DATABASE_URL: postgresql://database:5432
+          DATABASE_URL: postgresql://localhost:5432
         run: bundle exec rspec
 
