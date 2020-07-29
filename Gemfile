@@ -1,12 +1,10 @@
-ruby '2.3.1'
-
 source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'rack'
 gem 'rake'
 
-gem 'pg', '~> 0.18'
+gem 'pg', '~> 1.2'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 
