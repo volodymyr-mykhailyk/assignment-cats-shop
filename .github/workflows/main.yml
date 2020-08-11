@@ -31,7 +31,7 @@ jobs:
       - name: Set up Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.6.x'
+          ruby-version: '2.7.x'
       - name: Install PostgreSQL dependencies
         run: sudo apt-get -yqq install libpq-dev
       - name: Set up Bundler
