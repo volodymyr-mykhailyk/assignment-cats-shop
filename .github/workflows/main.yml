@@ -43,13 +43,15 @@ jobs:
 
       - name: Set up Database
         env:
-          DATABASE_URL: postgresql://app:pass@localhost:5432
+          DATABASE_URL: postgresql://app:pass@localhost:5432/cats_shop_test
+          RACK_ENV: test
         run: |
           bundle exec rake db:create
           bundle exec rake db:migrate
 
       - name: Run Unit Tests
         env:
-          DATABASE_URL: postgresql://app:pass@localhost:5432
+          DATABASE_URL: postgresql://app:pass@localhost:5432/cats_shop_test
+          RACK_ENV: test
         run: bundle exec rspec
 
