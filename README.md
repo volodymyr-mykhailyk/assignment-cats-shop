@@ -35,18 +35,23 @@ We would like to see a solution that has following traits:
 ### Setup and run application
 
 #### Setup
-Need ruby 2.6
+Need ruby 2.7
+
 - `bundle install` - install dependency
-- Configure database in `config/database.yml` or pass configuraton via `DATABASE_URL` (see section below)
+- Configure database in `config/database.yml` or pass configuration via `DATABASE_URL` (see section below)
+- Specify `RACK_ENV` accordingly to the task you are running (see section below)
 - `bundle exec rake db:create` - create db and run migrations
 - `bundle exec rake db:migrate` - migrate db to latest version
 - `bundle exec rake db:seed` - seed database with basic data
-- `bundle exec rake db:test:prepare` - setup test database based on dev database schema 
+
+Then depending on what you want to do:
 
 #### Run application
 - `bundle exec rackup -p 1234` - Launch web application on port `1234`
+
 #### Run tests
 - `bundle exec rspec`
+
 #### Environment variables
 - `DATABASE_URL` - url to database e.g `postgres://{user}:{password}@{hostname}:{port}/{database-name}`
-- `RACK_ENV` - environment for the app. possible values: `production`, `development`, `test`
+- `RACK_ENV` - environment for the app. possible values: `production`, `development`, `test`.
