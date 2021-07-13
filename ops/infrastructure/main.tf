@@ -63,7 +63,8 @@ module myip {
 
 resource "aws_security_group" "instance" {
   vpc_id = aws_vpc.main.id
-  name = "${var.name}-instance"
+  name_prefix = "${var.name}-instance"
+  description = "${var.name} instance"
 
   ingress {
     from_port = 22
@@ -84,6 +85,10 @@ resource "aws_security_group" "instance" {
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
