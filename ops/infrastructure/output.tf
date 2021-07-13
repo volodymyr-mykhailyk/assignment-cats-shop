@@ -9,3 +9,7 @@ output "subnet_ids" {
 output "availability_zones" {
   value = aws_subnet.public.*.availability_zone
 }
+
+output "public_ip" {
+  value = aws_instance.instance.public_ip
+}
