@@ -62,29 +62,29 @@ module myip {
 }
 
 resource "aws_security_group" "instance" {
-  vpc_id = aws_vpc.main.id
+  vpc_id      = aws_vpc.main.id
   name_prefix = "${var.name}-instance"
   description = "${var.name} instance"
 
   ingress {
-    from_port = 22
-    to_port = 22
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${module.myip.address}/32"]
-    protocol = "tcp"
+    protocol    = "tcp"
   }
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   lifecycle {
@@ -112,11 +112,37 @@ resource "aws_instance" "instance" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.nano"
 
-  key_name = aws_key_pair.server_key.key_name
+  key_name               = aws_key_pair.server_key.key_name
   vpc_security_group_ids = [aws_security_group.instance.id]
-  subnet_id = aws_subnet.public.1.id
+  subnet_id              = aws_subnet.public.1.id
 
   associate_public_ip_address = true
+
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/../scripts/install_docker_ec2.sh",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = self.public_ip
+      private_key = file("~/.ssh/id_rsa")
+    }
+  }
+
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/../scripts/run_app_ec2.sh"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = self.public_ip
+      private_key = file("~/.ssh/id_rsa")
+    }
+  }
 
   tags = {
     Name = "${var.name}-1"
