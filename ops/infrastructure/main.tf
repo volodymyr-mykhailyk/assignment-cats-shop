@@ -108,6 +108,10 @@ data "aws_ami" "ubuntu" {
   owners = ["amazon"]
 }
 
+data "template_file" "user_data" {
+  template = file("${path.module}/templates/app_user_data.sh.tpl")
+}
+
 resource "aws_instance" "instance" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.nano"
@@ -116,33 +120,9 @@ resource "aws_instance" "instance" {
   vpc_security_group_ids = [aws_security_group.instance.id]
   subnet_id              = aws_subnet.public.1.id
 
+  user_data = data.template_file.user_data.rendered
+
   associate_public_ip_address = true
-
-  provisioner "remote-exec" {
-    scripts = [
-      "${path.module}/../scripts/install_docker_ec2.sh",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      host        = self.public_ip
-      private_key = file("~/.ssh/id_rsa")
-    }
-  }
-
-  provisioner "remote-exec" {
-    scripts = [
-      "${path.module}/../scripts/run_app_ec2.sh"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      host        = self.public_ip
-      private_key = file("~/.ssh/id_rsa")
-    }
-  }
 
   tags = {
     Name = "${var.name}-1"
