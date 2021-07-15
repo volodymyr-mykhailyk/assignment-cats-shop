@@ -11,5 +11,5 @@ output "availability_zones" {
 }
 
 output "public_ip" {
-  value = aws_instance.instance.public_ip
+  value = module.instance.public_ip
 }
