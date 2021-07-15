@@ -1,13 +1,13 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value = module.vpc.vpc_id
 }
 
 output "subnet_ids" {
-  value = aws_subnet.public.*.id
+  value = module.vpc.subnet_ids
 }
 
 output "availability_zones" {
-  value = aws_subnet.public.*.availability_zone
+  value = module.vpc.availability_zones
 }
 
 output "public_ip" {
