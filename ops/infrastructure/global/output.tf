@@ -9,7 +9,3 @@ output "subnet_ids" {
 output "availability_zones" {
   value = module.vpc.availability_zones
 }
-
-output "public_ip" {
-  value = module.instance.public_ip
-}
