@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-state-517804334742"
+    key    = "assignment-cats-shop/live.tfstate"
+    region = "eu-central-1"
+  }
+}
+
 //module "instance" {
 //  source = "../modules/aws-app-instance"
 //
