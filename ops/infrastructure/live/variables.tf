@@ -1,5 +1,5 @@
-//variable "name" {
-//  type = string
-//  description = "Name of all infrastructure"
-//  default = "cats-shop"
-//}
+variable "name" {
+  type = string
+  description = "Name of all infrastructure"
+  default = "cats-shop"
+}
