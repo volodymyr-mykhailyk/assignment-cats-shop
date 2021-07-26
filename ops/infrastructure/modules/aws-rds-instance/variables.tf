@@ -10,9 +10,3 @@ variable "vpc" {
   })
   description = "VPC information"
 }
-
-variable "inbound_security_groups" {
-  type        = list(string)
-  description = "List of inbound security groups that allow connection to the db"
-}
-

@@ -23,7 +23,6 @@ module "database" {
   source = "../modules/aws-rds-instance"
   name = var.name
   vpc = local.global_config
-  inbound_security_groups = []
 }
 
 module "instance" {
