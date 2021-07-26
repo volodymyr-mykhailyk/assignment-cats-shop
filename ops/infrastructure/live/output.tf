@@ -8,5 +8,9 @@ output "public_ip" {
 
 output "database_host" {
   value = module.database.host
+}
+
+output "database_url" {
+  value = module.database.connection_url
   sensitive = true
 }
