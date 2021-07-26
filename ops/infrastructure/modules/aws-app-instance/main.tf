@@ -64,7 +64,7 @@ resource "aws_instance" "instance" {
   instance_type = "t3.nano"
 
   key_name               = aws_key_pair.server_key.key_name
-  vpc_security_group_ids = [aws_security_group.instance.id]
+  vpc_security_group_ids = concat([aws_security_group.instance.id], var.assigned_security_groups)
   subnet_id              = var.subnet_id
 
   user_data = data.template_file.user_data.rendered

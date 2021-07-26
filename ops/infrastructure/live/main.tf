@@ -32,4 +32,5 @@ module "instance" {
   name      = var.name
   vpc_id    = local.global_config.vpc_id
   subnet_id = element(local.global_config.subnet_ids, 0)
+  assigned_security_groups = [module.database.connection_security_group_id]
 }

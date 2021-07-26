@@ -13,3 +13,8 @@ variable "subnet_id" {
   description = "Subnet to deploy"
 }
 
+variable "assigned_security_groups" {
+  type        = list(string)
+  default     = []
+  description = "List of assigned security groups"
+}
