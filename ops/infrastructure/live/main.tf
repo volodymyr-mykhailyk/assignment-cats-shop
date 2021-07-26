@@ -19,9 +19,15 @@ locals {
   global_config = data.terraform_remote_state.global.outputs
 }
 
+module "database" {
+  source = "../modules/aws-rds-instance"
+  name = var.name
+  vpc = local.global_config
+  inbound_security_groups = []
+}
+
 module "instance" {
   source = "../modules/aws-app-instance"
-
 
   name      = var.name
   vpc_id    = local.global_config.vpc_id

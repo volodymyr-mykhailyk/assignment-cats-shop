@@ -5,3 +5,8 @@ output "vpc_id" {
 output "public_ip" {
   value = module.instance.public_ip
 }
+
+output "database_host" {
+  value = module.database.host
+  sensitive = true
+}
