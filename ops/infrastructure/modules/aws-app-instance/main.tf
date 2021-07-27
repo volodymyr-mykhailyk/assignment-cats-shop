@@ -57,11 +57,15 @@ data "aws_ami" "ubuntu" {
 
 data "template_file" "user_data" {
   template = file("${path.module}/templates/app_user_data.sh.tpl")
+
+  vars = {
+    database_url = var.database_url
+  }
 }
 
 resource "aws_instance" "instance" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.nano"
+  instance_type = "t2.micro"
 
   key_name               = aws_key_pair.server_key.key_name
   vpc_security_group_ids = concat([aws_security_group.instance.id], var.assigned_security_groups)

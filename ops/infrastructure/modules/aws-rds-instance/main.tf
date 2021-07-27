@@ -7,12 +7,13 @@ resource "aws_db_instance" "main" {
   identifier_prefix = "${var.name}-"
 
   engine            = "postgres"
-  instance_class    = "db.t3.micro"
+  instance_class    = "db.t2.micro"
   allocated_storage = 5
 
   name     = replace(var.name, "-", "_")
   username = "root"
   password = random_password.password.result
+  skip_final_snapshot = true
 
   publicly_accessible = false
 

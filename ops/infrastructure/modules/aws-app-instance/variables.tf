@@ -13,6 +13,11 @@ variable "subnet_id" {
   description = "Subnet to deploy"
 }
 
+variable "database_url" {
+  type        = string
+  description = "Database URL"
+}
+
 variable "assigned_security_groups" {
   type        = list(string)
   default     = []
