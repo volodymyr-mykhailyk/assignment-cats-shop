@@ -1,4 +1,5 @@
-data "aws_availability_zones" "all" {
+locals {
+  availability_zones = sort(var.availability_zones)
 }
 
 resource "aws_vpc" "main" {
@@ -31,11 +32,11 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_subnet" "public" {
-  count = 2
+  for_each = toset(local.availability_zones)
 
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 1)
-  availability_zone = element(data.aws_availability_zones.all.names, count.index)
+  cidr_block        = cidrsubnet(var.cidr_block, 8, index(local.availability_zones, each.key) + 1)
+  availability_zone = each.key
 
   tags = {
     Name = "${var.name}-public-1"
@@ -43,8 +44,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = length(aws_subnet.public)
+  for_each = aws_subnet.public
 
   route_table_id = aws_route_table.public.id
-  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  subnet_id      = each.value.id
 }

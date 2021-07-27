@@ -14,3 +14,8 @@ variable "subnets_count" {
   description = "Number of subnets to create"
 }
 
+variable "availability_zones" {
+  type = set(string)
+  description = "Availability zones to setup the VPC in"
+}
+

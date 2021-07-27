@@ -7,11 +7,11 @@ output "vpc_id" {
 output "subnet_ids" {
   description = "VPC Id"
 
-  value = aws_subnet.public.*.id
+  value = [for subnet in aws_subnet.public: subnet.id]
 }
 
 output "availability_zones" {
   description = "Availability Zones"
 
-  value = aws_subnet.public.*.availability_zone
+  value = [for subnet in aws_subnet.public: subnet.availability_zone]
 }

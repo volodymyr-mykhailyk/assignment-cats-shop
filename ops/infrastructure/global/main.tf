@@ -6,9 +6,13 @@ terraform {
   }
 }
 
+data "aws_availability_zones" "all" {
+}
+
 module "vpc" {
   source = "../modules/aws-vpc"
 
   name       = var.name
   cidr_block = var.vpc_cidr
+  availability_zones = reverse(data.aws_availability_zones.all.names)
 }
