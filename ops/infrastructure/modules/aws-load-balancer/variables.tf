@@ -13,5 +13,12 @@ variable "vpc" {
 
 variable "instance_ids" {
   type = list(string)
-  description = "Instances to hide behind load balancer"
+  default = []
+  description = "Instances to attach to the load balancer"
+}
+
+variable "autoscaling_group_ids" {
+  type = list(string)
+  default = []
+  description = "Autoscaling Groups to attach to the load balancer"
 }
