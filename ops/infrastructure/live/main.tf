@@ -25,13 +25,24 @@ module "database" {
   vpc = local.global_config
 }
 
-module "instance" {
+module "instances" {
   source = "../modules/aws-app-instance"
 
   name      = var.name
-  vpc_id    = local.global_config.vpc_id
-  subnet_id = element(local.global_config.subnet_ids, 0)
+  vpc    = local.global_config
 
+  instances = 3
   database_url = module.database.connection_url
+
+  inbound_security_groups = [module.balancer.connection_security_group_id]
   assigned_security_groups = [module.database.connection_security_group_id]
+}
+
+module "balancer" {
+  source = "../modules/aws-load-balancer"
+
+  name = var.name
+  vpc = local.global_config
+
+  instance_ids = module.instances.ids
 }

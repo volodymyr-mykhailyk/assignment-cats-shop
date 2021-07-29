@@ -9,7 +9,7 @@ resource "aws_key_pair" "server_key" {
 }
 
 resource "aws_security_group" "instance" {
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc.vpc_id
   name_prefix = "${var.name}-instance"
   description = "${var.name} instance"
 
@@ -24,7 +24,7 @@ resource "aws_security_group" "instance" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = var.inbound_security_groups
   }
 
   egress {
@@ -64,18 +64,20 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "instance" {
+  count = var.instances
+
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
 
   key_name               = aws_key_pair.server_key.key_name
   vpc_security_group_ids = concat([aws_security_group.instance.id], var.assigned_security_groups)
-  subnet_id              = var.subnet_id
+  subnet_id              = element(var.vpc.subnet_ids, count.index)
 
   user_data = data.template_file.user_data.rendered
 
   associate_public_ip_address = true
 
   tags = {
-    Name = "${var.name}-1"
+    Name = "${var.name}-${count.index}"
   }
 }
