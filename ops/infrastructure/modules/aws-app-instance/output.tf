@@ -8,8 +8,6 @@ output "public_ips" {
   value = aws_instance.instance.*.public_ip
 }
 
-output "public_endpoints" {
-  description = "Public Instance Endpoints"
-
-  value = aws_instance.instance.*.public_dns
+output "connection_security_group_id" {
+  value = var.app_configuration.connection_security_group_id
 }

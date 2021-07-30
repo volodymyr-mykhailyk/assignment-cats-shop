@@ -26,7 +26,7 @@ resource "aws_lb" "balancer" {
   load_balancer_type = "application"
 
   subnets = var.vpc.subnet_ids
-  security_groups = [aws_security_group.main.id]
+  security_groups = concat([aws_security_group.main.id], var.assigned_security_groups)
 }
 
 resource "aws_lb_target_group" "http" {

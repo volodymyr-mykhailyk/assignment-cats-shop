@@ -11,16 +11,9 @@ variable "vpc" {
   description = "VPC information"
 }
 
-variable "instance_ids" {
-  type = list(string)
-  default = []
-  description = "Instances to attach to the load balancer"
-}
-
-variable "autoscaling_group_ids" {
-  type = list(string)
-  default = []
-  description = "Autoscaling Groups to attach to the load balancer"
+variable "database_url" {
+  type        = string
+  description = "Database URL"
 }
 
 variable "assigned_security_groups" {
@@ -28,4 +21,3 @@ variable "assigned_security_groups" {
   default     = []
   description = "List of assigned security groups"
 }
-

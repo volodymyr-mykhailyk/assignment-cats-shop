@@ -25,17 +25,25 @@ module "database" {
   vpc = local.global_config
 }
 
+module "app_config" {
+  source = "../modules/aws-app-configuration"
+
+  name      = var.name
+  vpc    = local.global_config
+
+  database_url = module.database.connection_url
+
+  assigned_security_groups = [module.database.connection_security_group_id]
+}
+
 module "instances" {
   source = "../modules/aws-app-instance"
 
   name      = var.name
   vpc    = local.global_config
+  app_configuration = module.app_config
 
-  instances = 0
-  database_url = module.database.connection_url
-
-  inbound_security_groups = [module.balancer.connection_security_group_id]
-  assigned_security_groups = [module.database.connection_security_group_id]
+  instances = 1
 }
 
 module "autoscaler" {
@@ -43,10 +51,7 @@ module "autoscaler" {
 
   name = var.name
   vpc = local.global_config
-
-  database_url = module.database.connection_url
-  inbound_security_groups = [module.balancer.connection_security_group_id]
-  assigned_security_groups = [module.database.connection_security_group_id]
+  app_configuration = module.app_config
 }
 
 module "balancer" {
@@ -57,4 +62,6 @@ module "balancer" {
 
   instance_ids = module.instances.ids
   autoscaling_group_ids = [module.autoscaler.id]
+
+  assigned_security_groups = [module.app_config.connection_security_group_id]
 }
