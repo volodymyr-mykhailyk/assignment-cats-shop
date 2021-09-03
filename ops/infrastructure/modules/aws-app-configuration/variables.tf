@@ -16,6 +16,14 @@ variable "database_url" {
   description = "Database URL"
 }
 
+variable "ssh_key" {
+  type = object({
+    public_key_pem: string
+    public_key_openssh: string
+  })
+  description = "SSH Key used to connect to the instance"
+}
+
 variable "assigned_security_groups" {
   type        = list(string)
   default     = []

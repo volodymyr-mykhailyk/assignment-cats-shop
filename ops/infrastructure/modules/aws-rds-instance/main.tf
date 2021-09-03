@@ -7,7 +7,7 @@ resource "aws_db_instance" "main" {
   identifier_prefix = "${var.name}-"
 
   engine            = "postgres"
-  instance_class    = "db.t2.micro"
+  instance_class    = "db.t3.micro"
   allocated_storage = 5
 
   name     = replace(var.name, "-", "_")

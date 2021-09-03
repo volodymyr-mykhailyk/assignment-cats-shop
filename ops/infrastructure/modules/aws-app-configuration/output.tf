@@ -13,3 +13,7 @@ output "version" {
 output "connection_security_group_id" {
   value = aws_security_group.connector.id
 }
+
+output "ssh_key" {
+  value = ""
+}
