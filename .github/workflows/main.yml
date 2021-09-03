@@ -75,7 +75,9 @@ jobs:
         run: ls -R
 
       - name: Deploy Application
-        run: ssh ec2-user@$(cat deployment/host) -o StrictHostKeyChecking=no -i deployment/host.pem 'RELEASE_IMAGE=vnovitskyi/assignment-kittens-store:latest bash -s' < ops/scripts/deploy_app.sh
+        run: |
+          chmod 600 deployment/host.pem
+          ssh ec2-user@$(cat deployment/host) -o StrictHostKeyChecking=no -i deployment/host.pem 'RELEASE_IMAGE=vnovitskyi/assignment-kittens-store:latest bash -s' < ops/scripts/deploy_app.sh
 
       - name: Verify Application Running
         run: |
