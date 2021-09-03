@@ -20,15 +20,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-#      - name: Cache dependencies
-#        uses: actions/cache@v1
-#        with:
-#          path: vendor/bundle
-#          key: ${{ runner.OS }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-#          restore-keys: ${{ runner.OS }}-gems-
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.2
 
       - name: Terraform Format
         id: fmt
