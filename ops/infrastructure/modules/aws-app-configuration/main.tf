@@ -16,7 +16,6 @@ resource "aws_security_group" "instance" {
   ingress {
     from_port   = 22
     to_port     = 22
-    cidr_blocks = ["${module.myip.address}/32"]
     protocol    = "tcp"
   }
 
@@ -24,7 +23,6 @@ resource "aws_security_group" "instance" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.connector.id]
   }
 
   egress {
