@@ -79,6 +79,5 @@ jobs:
 
       - name: Verify Application Running
         run: |
-          sleep 5
           curl $(cat deployment/host)
           curl --fail $(cat deployment/host)
