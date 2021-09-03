@@ -60,9 +60,11 @@ jobs:
     needs: [build]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     steps:
-      - name: Get Infrastructure Info
-        uses: actions/download-artifact@v2
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: infrastructure.yml
+          workflow_conclusion: success
           name: infrastructure-live
           path: deployment
 
