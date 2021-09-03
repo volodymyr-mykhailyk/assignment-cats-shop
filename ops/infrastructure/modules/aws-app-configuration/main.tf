@@ -5,7 +5,7 @@ module myip {
 
 resource "aws_key_pair" "server_key" {
   key_name_prefix = var.name
-  public_key      = file("~/.ssh/id_rsa.pub")
+  public_key      = var.ssh_key.public_key_openssh
 }
 
 resource "aws_security_group" "instance" {
