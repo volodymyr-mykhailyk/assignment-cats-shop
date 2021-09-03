@@ -85,9 +85,9 @@ jobs:
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           mkdir output
-          terraform output -raw public_ip > output/host
-          terraform output -raw ssh_key_public > output/host.pub
-          terraform output -raw ssh_key_private > output/host.pem
+          terraform-bin output -raw public_ip > output/host
+          terraform-bin output -raw ssh_key_public > output/host.pub
+          terraform-bin output -raw ssh_key_private > output/host.pem
 
       - name: Store infrastructure information
         uses: actions/upload-artifact@v2
