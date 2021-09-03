@@ -3,9 +3,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'ops/infrastructure/**'
   pull_request:
     branches:
       - master
+    paths:
+      - 'ops/infrastructure/**'
 
 jobs:
   infrastructure-live:
