@@ -1,8 +1,3 @@
-module myip {
-  source  = "4ops/myip/http"
-  version = "1.0.0"
-}
-
 resource "aws_key_pair" "server_key" {
   key_name_prefix = var.name
   public_key      = var.ssh_key.public_key_openssh
@@ -17,12 +12,14 @@ resource "aws_security_group" "instance" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
