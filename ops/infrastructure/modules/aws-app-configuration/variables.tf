@@ -1,0 +1,23 @@
+variable "name" {
+  type        = string
+  description = "Name of instance"
+}
+
+variable "vpc" {
+  type        = object({
+    vpc_id     = string
+    subnet_ids = list(string)
+  })
+  description = "VPC information"
+}
+
+variable "database_url" {
+  type        = string
+  description = "Database URL"
+}
+
+variable "assigned_security_groups" {
+  type        = list(string)
+  default     = []
+  description = "List of assigned security groups"
+}
