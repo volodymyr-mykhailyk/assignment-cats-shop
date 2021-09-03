@@ -7,7 +7,7 @@ output "public_endpoint" {
 }
 
 output "database_url" {
-  value = module.database.connection_url
+  value     = module.database.connection_url
   sensitive = true
 }
 
@@ -16,6 +16,6 @@ output "ssh_key_public" {
 }
 
 output "ssh_key_private" {
-  value = tls_private_key.ssh_key.private_key_pem
+  value     = tls_private_key.ssh_key.private_key_pem
   sensitive = true
 }

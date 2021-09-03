@@ -25,15 +25,15 @@ resource "tls_private_key" "ssh_key" {
 
 module "database" {
   source = "../modules/aws-rds-instance"
-  name = var.name
-  vpc = local.global_config
+  name   = var.name
+  vpc    = local.global_config
 }
 
 module "app_config" {
   source = "../modules/aws-app-configuration"
 
-  name      = var.name
-  vpc    = local.global_config
+  name    = var.name
+  vpc     = local.global_config
   ssh_key = tls_private_key.ssh_key
 
   database_url = module.database.connection_url
@@ -44,8 +44,8 @@ module "app_config" {
 module "instances" {
   source = "../modules/aws-app-instance"
 
-  name      = var.name
-  vpc    = local.global_config
+  name              = var.name
+  vpc               = local.global_config
   app_configuration = module.app_config
 
   instances = 1
