@@ -80,3 +80,17 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
+
+      - name: Save Outputs
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: |
+          mkdir output
+          terraform output -raw public_ip > output/host
+          terraform output -raw ssh_key_public > output/host.pub
+          terraform output -raw ssh_key_private > output/host.pem
+
+      - name: Store infrastructure information
+        uses: actions/upload-artifact@v2
+        with:
+          name: infrastructure-live
+          path: ops/infrastructure/live/output/

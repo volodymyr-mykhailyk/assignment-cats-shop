@@ -2,7 +2,7 @@ output "public_ip" {
   value = module.instances.public_ips[0]
 }
 
-output "public_endpoint" {
+output "public_dns" {
   value = module.instances.public_dns[0]
 }
 
