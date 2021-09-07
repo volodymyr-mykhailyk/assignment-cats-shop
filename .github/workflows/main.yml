@@ -47,7 +47,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [infrastructure]
+    needs: [ infrastructure ]
     outputs:
       docker_image: ${{ steps.docker.outputs.docker_image }}
     services:
@@ -119,7 +119,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [infrastructure, build]
+    needs: [ infrastructure, build ]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -146,12 +146,14 @@ jobs:
       - name: Login to cluster
         run: aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
 
-      - name: Test cluster access
-        run: kubectl get nodes
+      - name: Deploy Application
+        working-directory: ops/deployment
+        run: bash deploy default ${DOCKER_IMAGE} ${$DATABASE_URL}
 
-      - name: Test input variables
-        run: |
-          echo "docker_image: $DOCKER_IMAGE"
-          echo "cluster_name: $CLUSTER_NAME"
-          echo "database_url: $DATABASE_URL"
+      - name: Get Application URL
+        id: application_url
+        run: echo "::set-output url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname})'
+
+      - name: Test deployment
+        run: curl ${{ steps.application_url.outputs.url }}
 

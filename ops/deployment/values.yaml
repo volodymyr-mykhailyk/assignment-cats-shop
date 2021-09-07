@@ -1,0 +1,6 @@
+database_url: 'postgresql://postgres:postgres@postgres/dev'
+
+app:
+  replica_count: 2
+  image: 'DOCKER_IMAGE'
+

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -e
+
+if [ -z $1 ]
+  then
+    echo 'Please provide environment name as argument... (staging, production)'
+    echo 'example: `bash deploy *staging* latest database_url`'
+    exit 1
+fi
+
+if [ -z $2 ]
+  then
+    echo 'Please provide docker image to deploy.. (latest, develop, release-x.x.x)'
+    echo 'example: `bash deploy staging *release-0.1.0* database_url'
+    exit 1
+fi
+
+if [ -z $3 ]
+  then
+    echo 'Please provide database url'
+    echo 'example: `bash deploy staging release-0.1.0 *database_url*'
+    exit 1
+fi
+
+ENVIRONMENT=$1
+DOCKER_IMAGE=$2
+DATABASE_URL=$3
+PRODUCT_NAME=cats-shop
+HELM_REPO=./chart
+
+if [ $2 == "cleanup" ]
+then
+  helm del "${PRODUCT_NAME}-${ENVIRONMENT}"
+else
+  helm upgrade -i "${PRODUCT_NAME}-${ENVIRONMENT}" \
+    ./chart \
+    -f ./values.yaml \
+    --namespace ${ENVIRONMENT} \
+    --set database_url=${DATABASE_URL} \
+    --set app.image=${DOCKER_IMAGE} \
+    --wait \
+    --timeout 10m
+fi
