@@ -29,6 +29,31 @@ resource "aws_ecr_repository" "repo" {
   name = var.name
 }
 
+resource "aws_security_group" "cluster_access" {
+  name_prefix = "${var.name}-eks-access-"
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks = [local.global_config.cidr_block]
+  }
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    cidr_blocks = [local.global_config.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 module "database" {
   source = "../modules/aws-rds-instance"
   name   = var.name
@@ -42,4 +67,5 @@ module "eks" {
 
   instances_count = 2
   instances_type  = "t2.micro"
+  cluster_access_groups = [aws_security_group.cluster_access.id]
 }

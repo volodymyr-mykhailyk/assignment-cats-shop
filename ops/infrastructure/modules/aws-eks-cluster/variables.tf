@@ -22,3 +22,9 @@ variable "instances_type" {
   default     = "t2.micro"
   description = "Type of instances"
 }
+
+variable "cluster_access_groups" {
+  type = list(string)
+  default = []
+  description = "EKS cluster security groups"
+}

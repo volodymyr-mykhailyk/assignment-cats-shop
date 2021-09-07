@@ -4,6 +4,7 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
     subnet_ids = var.vpc.subnet_ids
+    security_group_ids = var.cluster_access_groups
   }
 
   depends_on = [
