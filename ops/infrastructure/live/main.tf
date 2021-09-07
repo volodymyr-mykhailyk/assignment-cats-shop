@@ -8,7 +8,7 @@ terraform {
 
 data "terraform_remote_state" "global" {
   backend = "s3"
-  config  = {
+  config = {
     bucket = "terraform-state-517804334742"
     key    = "assignment-cats-shop/global.tfstate"
     region = "eu-central-1"

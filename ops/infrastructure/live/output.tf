@@ -12,4 +12,5 @@ output "eks_cluster_certificate" {
 
 output "database_url" {
   value     = module.database.connection_url
+  sensitive = true
 }
