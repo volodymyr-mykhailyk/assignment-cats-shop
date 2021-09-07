@@ -10,9 +10,9 @@ resource "aws_db_instance" "main" {
   instance_class    = "db.t3.micro"
   allocated_storage = 5
 
-  name     = replace(var.name, "-", "_")
-  username = "root"
-  password = random_password.password.result
+  name                = replace(var.name, "-", "_")
+  username            = "root"
+  password            = random_password.password.result
   skip_final_snapshot = true
 
   publicly_accessible = false
@@ -39,6 +39,13 @@ resource "aws_security_group" "main" {
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [aws_security_group.connector.id]
+  }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc.cidr_block]
   }
 
   egress {

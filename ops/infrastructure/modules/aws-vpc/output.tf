@@ -15,3 +15,7 @@ output "availability_zones" {
 
   value = [for subnet in aws_subnet.public: subnet.availability_zone]
 }
+
+output "cidr_block" {
+  value = var.cidr_block
+}
