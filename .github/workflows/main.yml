@@ -15,6 +15,10 @@ jobs:
     defaults:
       run:
         working-directory: ops/infrastructure/live
+    outputs:
+      cluster_name: ${{ steps.terraform_output.outputs.cluster_name }}
+      cluster_certificate: ${{ steps.terraform_output.outputs.cluster_certificate }}
+      database_url: ${{ steps.terraform_output.outputs.database_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -31,8 +35,14 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name: Save Outputs
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      - name: Save Results to Outputs
+        id: terraform_output
+        run: |
+          echo "::set-output name=cluster_name::$(terraform-bin output -raw eks_cluster_name)"
+          echo "::set-output name=cluster_certificate::$(terraform-bin output -raw eks_cluster_certificate)"
+          echo "::set-output name=database_url::$(terraform-bin output -raw database_url)"
+
+      - name: Save Results To Artifacts
         run: |
           mkdir output
           terraform-bin output -raw ecr_repository_url > output/ecr_repository_url.txt
@@ -49,6 +59,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [infrastructure]
+    outputs:
+      docker_image: ${{ steps.docker.outputs.docker_image }}
     services:
       database:
         image: postgres:12.1-alpine
@@ -99,6 +111,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
+        id: docker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cats-shop
@@ -106,6 +119,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=docker_image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
   deploy:
     runs-on: ubuntu-latest
@@ -114,4 +128,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - name: Configure AWS client
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to cluster
+        env:
+          CLUSTER_NAME: ${{ needs.infrastructure.outputs.cluster_name }}
+        run: aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+
+      - name: Test cluster access
+        run: kubectl get nodes
+
+      - name: Test input variables
+        run: |
+          echo "docker image: ${{ needs.build.outputs.docker_image }}"
+          echo "cluster_name: ${{ needs.infrastructure.outputs.cluster_name }}"
+          echo "database_url: ${{ needs.infrastructure.outputs.database_url }}"
 
