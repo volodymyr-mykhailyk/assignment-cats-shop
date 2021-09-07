@@ -55,10 +55,6 @@ resource "aws_eks_node_group" "workers" {
   depends_on = [
     aws_eks_cluster.cluster
   ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_iam_role" "nodes" {
