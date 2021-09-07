@@ -10,8 +10,45 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ops/infrastructure/live
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.2
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      - name: Save Outputs
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: |
+          mkdir output
+          terraform-bin output -raw ecr_repository_url > output/ecr_repository_url.txt
+          terraform-bin output -raw eks_cluster_name > output/eks_cluster_name.txt
+          terraform-bin output -raw eks_cluster_certificate > output/eks_cluster_certificate.txt
+          terraform-bin output -raw database_url > output/database_url.txt
+
+      - name: Store infrastructure information
+        uses: actions/upload-artifact@v2
+        with:
+          name: infrastructure-live
+          path: ops/infrastructure/live/output/
+
   build:
     runs-on: ubuntu-latest
+    needs: [infrastructure]
     services:
       database:
         image: postgres:12.1-alpine
