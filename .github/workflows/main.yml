@@ -15,10 +15,6 @@ jobs:
     defaults:
       run:
         working-directory: ops/infrastructure/live
-    outputs:
-      cluster_name: ${{ steps.terraform_output.outputs.cluster_name }}
-      cluster_certificate: ${{ steps.terraform_output.outputs.cluster_certificate }}
-      database_url: ${{ steps.terraform_output.outputs.database_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -35,26 +31,19 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name: Save Results to Outputs
-        id: terraform_output
-        run: |
-          echo "::set-output name=cluster_name::$(terraform-bin output -raw eks_cluster_name)"
-          echo "::set-output name=cluster_certificate::$(terraform-bin output -raw eks_cluster_certificate)"
-          echo "::set-output name=database_url::$(terraform-bin output -raw database_url)"
-
       - name: Save Results To Artifacts
         run: |
-          mkdir output
-          terraform-bin output -raw ecr_repository_url > output/ecr_repository_url.txt
-          terraform-bin output -raw eks_cluster_name > output/eks_cluster_name.txt
-          terraform-bin output -raw eks_cluster_certificate > output/eks_cluster_certificate.txt
-          terraform-bin output -raw database_url > output/database_url.txt
+          mkdir outputs
+          terraform-bin output -raw ecr_repository_url > outputs/ecr_repository_url.txt
+          terraform-bin output -raw eks_cluster_name > outputs/eks_cluster_name.txt
+          terraform-bin output -raw eks_cluster_certificate > outputs/eks_cluster_certificate.txt
+          terraform-bin output -raw database_url > outputs/database_url.txt
 
       - name: Store infrastructure information
         uses: actions/upload-artifact@v2
         with:
-          name: infrastructure-live
-          path: ops/infrastructure/live/output/
+          name: infrastructure
+          path: ops/infrastructure/live/outputs/
 
   build:
     runs-on: ubuntu-latest
@@ -111,7 +100,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
-        id: docker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cats-shop
@@ -119,7 +107,15 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=docker_image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          mkdir outputs
+          echo "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > outputs/docker_image.txt
+
+      - name: Store build information
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: outputs
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -127,6 +123,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - name: Get Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Configure environment
+        run: |
+          echo "DOCKER_IMAGE=$(<artifacts/build/docker_image.txt)" >> $GITHUB_ENV
+          echo "DATABASE_URL=$(<artifacts/infrastructure/database_url.txt)" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=$(<artifacts/infrastructure/eks_cluster_name.txt)" >> $GITHUB_ENV
+          echo "::add-mask::$(<artifacts/infrastructure/database_url.txt)"
 
       - name: Configure AWS client
         uses: aws-actions/configure-aws-credentials@v1
@@ -136,8 +144,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to cluster
-        env:
-          CLUSTER_NAME: ${{ needs.infrastructure.outputs.cluster_name }}
         run: aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
 
       - name: Test cluster access
@@ -145,7 +151,7 @@ jobs:
 
       - name: Test input variables
         run: |
-          echo "docker image: ${{ needs.build.outputs.docker_image }}"
-          echo "cluster_name: ${{ needs.infrastructure.outputs.cluster_name }}"
-          echo "database_url: ${{ needs.infrastructure.outputs.database_url }}"
+          echo "docker_image: $DOCKER_IMAGE"
+          echo "cluster_name: $CLUSTER_NAME"
+          echo "database_url: $DATABASE_URL"
 
