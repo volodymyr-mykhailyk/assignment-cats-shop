@@ -1,21 +1,15 @@
-output "public_ip" {
-  value = module.instances.public_ips[0]
+output "ecr_repository_url" {
+  value = aws_ecr_repository.repo.repository_url
 }
 
-output "public_dns" {
-  value = module.instances.public_dns[0]
+output "eks_cluster_name" {
+  value = module.eks.cluster_name
+}
+
+output "eks_cluster_certificate" {
+  value = module.eks.cluster_ca_certificate
 }
 
 output "database_url" {
   value     = module.database.connection_url
-  sensitive = true
-}
-
-output "ssh_key_public" {
-  value = tls_private_key.ssh_key.public_key_openssh
-}
-
-output "ssh_key_private" {
-  value     = tls_private_key.ssh_key.private_key_pem
-  sensitive = true
 }
