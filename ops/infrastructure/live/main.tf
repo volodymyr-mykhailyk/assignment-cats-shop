@@ -3,6 +3,8 @@ terraform {
     bucket = "terraform-state-517804334742"
     key    = "assignment-cats-shop/live.tfstate"
     region = "eu-central-1"
+
+    dynamodb_table = "terraform-state-lock"
   }
 }
 
@@ -12,8 +14,6 @@ data "terraform_remote_state" "global" {
     bucket = "terraform-state-517804334742"
     key    = "assignment-cats-shop/global.tfstate"
     region = "eu-central-1"
-
-    dynamodb_table = "terraform-state-lock"
   }
 }
 
