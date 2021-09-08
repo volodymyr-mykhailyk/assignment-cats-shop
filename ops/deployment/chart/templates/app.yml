@@ -40,7 +40,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: {{ .Release.Name }}-app
   ports:
