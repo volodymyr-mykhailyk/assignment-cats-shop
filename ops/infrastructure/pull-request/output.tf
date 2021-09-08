@@ -15,5 +15,6 @@ output "eks_cluster_name" {
 }
 
 output "database_url" {
-  value = ""
+  value = "postgres://app:${random_password.db_password.result}@${kubernetes_service.postgres.spec[0].cluster_ip}:5432/app"
+  sensitive = true
 }
