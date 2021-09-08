@@ -31,19 +31,19 @@ resource "aws_ecr_repository" "repo" {
 
 resource "aws_security_group" "cluster_access" {
   name_prefix = "${var.name}-eks-access-"
-  vpc_id = local.global_config.vpc_id
+  vpc_id      = local.global_config.vpc_id
 
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = [local.global_config.cidr_block]
   }
 
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [local.global_config.cidr_block]
   }
 
@@ -66,7 +66,7 @@ module "eks" {
   name   = var.name
   vpc    = local.global_config
 
-  instances_count = 2
-  instances_type  = "t2.micro"
+  instances_count       = 2
+  instances_type        = "t2.micro"
   cluster_access_groups = [aws_security_group.cluster_access.id]
 }
