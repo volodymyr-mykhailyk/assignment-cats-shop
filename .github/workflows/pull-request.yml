@@ -8,6 +8,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  PULL_REQUEST_ID: ${{ github.event.number }}
 
 jobs:
   infrastructure-check:
@@ -118,4 +119,35 @@ jobs:
           RACK_ENV: test
         run: bundle exec rspec
 
+  infrastructure:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ops/infrastructure/pull-request
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.2
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="id=${PULL_REQUEST_ID}"
+
+      - name: Save Results To Artifacts
+        run: |
+          mkdir outputs
+          terraform-bin output -raw name > outputs/name.txt
+
+      - name: Store infrastructure information
+        uses: actions/upload-artifact@v2
+        with:
+          name: infrastructure
+          path: ops/infrastructure/live/outputs/
 
