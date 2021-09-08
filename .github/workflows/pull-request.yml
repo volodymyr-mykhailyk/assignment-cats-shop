@@ -172,7 +172,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: infrastructure
-          path: ops/infrastructure/live/outputs/
+          path: ops/infrastructure/pull-request/outputs/
 
   deploy:
     runs-on: ubuntu-latest
