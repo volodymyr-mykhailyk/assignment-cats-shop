@@ -39,5 +39,5 @@ else
     --set database_url=${DATABASE_URL} \
     --set app.image=${DOCKER_IMAGE} \
     --wait \
-    --timeout 10m
+    --timeout 5m
 fi
