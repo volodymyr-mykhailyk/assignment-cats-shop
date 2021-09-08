@@ -42,7 +42,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-app
   ports:
     - name: app
       protocol: TCP
