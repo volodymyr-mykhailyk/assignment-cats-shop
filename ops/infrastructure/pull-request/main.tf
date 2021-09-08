@@ -36,7 +36,7 @@ provider "kubernetes" {
 locals {
   global_config = data.terraform_remote_state.global.outputs
   live_config   = data.terraform_remote_state.live.outputs
-  name          = "pr-${var.id}"
+  name          = var.id
   db_name = "${random_pet.shop_name.id}-shop-db"
 }
 

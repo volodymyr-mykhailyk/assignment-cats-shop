@@ -8,7 +8,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  PULL_REQUEST_ID: ${{ github.event.number }}
+  PULL_REQUEST_ID: pr-${{ github.event.number }}
 
 jobs:
   infrastructure-check:
@@ -129,6 +129,7 @@ jobs:
           ECR_REPOSITORY: cats-shop
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo ${PULL_REQUEST_ID} > REVISION
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           mkdir outputs
@@ -156,7 +157,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config="key=assignment-cats-shop/pr-${PULL_REQUEST_ID}.tfstate"
+        run: terraform init -backend-config="key=assignment-cats-shop/${PULL_REQUEST_ID}.tfstate"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="id=${PULL_REQUEST_ID}"
@@ -209,7 +210,9 @@ jobs:
 
       - name: Get Application URL
         id: application_url
-        run: echo "::set-output name=url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+        run: |
+          echo "::set-output name=domain::$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')"
+          echo "::set-output name=port::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.spec.ports[0].nodePort}')"
 
       - name: Test deployment
-        run: curl ${{ steps.application_url.outputs.url }}
+        run: curl ${{ steps.application_url.outputs.domain }}:${{ steps.application_url.outputs.port }}

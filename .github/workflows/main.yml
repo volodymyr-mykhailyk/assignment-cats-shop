@@ -105,6 +105,7 @@ jobs:
           ECR_REPOSITORY: cats-shop
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "live:$(git rev-parse --short HEAD)" > REVISION
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           mkdir outputs
