@@ -10,6 +10,10 @@ output "eks_cluster_certificate" {
   value = module.eks.cluster_ca_certificate
 }
 
+output "els_cluster_endpoint" {
+  value = module.eks.cluster_endpoint
+}
+
 output "database_url" {
   value     = module.database.connection_url
   sensitive = true

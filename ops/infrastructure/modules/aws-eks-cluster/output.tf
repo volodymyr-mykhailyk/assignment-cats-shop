@@ -5,3 +5,7 @@ output "cluster_name" {
 output "cluster_ca_certificate" {
   value = aws_eks_cluster.cluster.certificate_authority[0].data
 }
+
+output "cluster_endpoint" {
+  value = aws_eks_cluster.cluster.endpoint
+}
