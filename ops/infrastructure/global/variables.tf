@@ -1,12 +1,12 @@
 variable "name" {
-  type = string
+  type        = string
   description = "Name of all infrastructure"
-  default = "cats-shop"
+  default     = "cats-shop"
 }
 
 variable "vpc_cidr" {
-  type = string
+  type        = string
   description = "VPC Cidr"
-  default = "10.0.0.0/16"
+  default     = "10.0.0.0/16"
 }
 

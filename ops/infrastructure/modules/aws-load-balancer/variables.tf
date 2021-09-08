@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "vpc" {
-  type        = object({
+  type = object({
     vpc_id     = string
     subnet_ids = list(string)
   })
@@ -12,14 +12,14 @@ variable "vpc" {
 }
 
 variable "instance_ids" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "Instances to attach to the load balancer"
 }
 
 variable "autoscaling_group_ids" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "Autoscaling Groups to attach to the load balancer"
 }
 

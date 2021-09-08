@@ -3,9 +3,9 @@ resource "aws_security_group" "main" {
   name_prefix = "${var.name}-alb-"
 
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -22,24 +22,24 @@ resource "aws_security_group" "main" {
 }
 
 resource "aws_lb" "balancer" {
-  name = "${var.name}-alb"
+  name               = "${var.name}-alb"
   load_balancer_type = "application"
 
-  subnets = var.vpc.subnet_ids
+  subnets         = var.vpc.subnet_ids
   security_groups = concat([aws_security_group.main.id], var.assigned_security_groups)
 }
 
 resource "aws_lb_target_group" "http" {
-  name = "${var.name}-http"
+  name     = "${var.name}-http"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc.vpc_id
 
   health_check {
-    interval = 5
-    timeout = 3
-    path = "/kittens/info"
-    healthy_threshold = 2
+    interval            = 5
+    timeout             = 3
+    path                = "/kittens/info"
+    healthy_threshold   = 2
     unhealthy_threshold = 3
   }
 }
@@ -65,6 +65,6 @@ resource "aws_lb_target_group_attachment" "instances" {
 resource "aws_autoscaling_attachment" "autoscalers" {
   count = length(var.autoscaling_group_ids)
 
-  alb_target_group_arn = aws_lb_target_group.http.arn
+  alb_target_group_arn   = aws_lb_target_group.http.arn
   autoscaling_group_name = element(var.autoscaling_group_ids, count.index)
 }

@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "vpc" {
-  type        = object({
+  type = object({
     vpc_id     = string
     subnet_ids = list(string)
     cidr_block = string
