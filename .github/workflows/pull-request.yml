@@ -215,4 +215,4 @@ jobs:
           echo "::set-output name=port::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.spec.ports[0].nodePort}')"
 
       - name: Test deployment
-        run: curl ${{ steps.application_url.outputs.domain }}:${{ steps.application_url.outputs.port }}
+        run: curl --max-time 300 ${{ steps.application_url.outputs.domain }}:${{ steps.application_url.outputs.port }}
