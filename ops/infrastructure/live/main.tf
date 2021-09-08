@@ -37,14 +37,14 @@ resource "aws_security_group" "cluster_access" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [local.global_config.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.global_config.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
