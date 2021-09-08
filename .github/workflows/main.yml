@@ -134,7 +134,6 @@ jobs:
           echo "DOCKER_IMAGE=$(<artifacts/build/docker_image.txt)" >> $GITHUB_ENV
           echo "DATABASE_URL=$(<artifacts/infrastructure/database_url.txt)" >> $GITHUB_ENV
           echo "CLUSTER_NAME=$(<artifacts/infrastructure/eks_cluster_name.txt)" >> $GITHUB_ENV
-          echo "::add-mask::$(<artifacts/infrastructure/database_url.txt)"
 
       - name: Configure AWS client
         uses: aws-actions/configure-aws-credentials@v1
