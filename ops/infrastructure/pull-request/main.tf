@@ -113,7 +113,7 @@ resource "kubernetes_service" "postgres" {
     namespace = kubernetes_namespace.namespace.metadata[0].name
   }
   spec {
-    type = "ClusterIp"
+    type = "ClusterIP"
     selector = {
       app = kubernetes_deployment.postgres.metadata[0].name
     }
