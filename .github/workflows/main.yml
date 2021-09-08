@@ -154,5 +154,5 @@ jobs:
         run: echo "::set-output name=url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
       - name: Test deployment
-        run: curl ${{ steps.application_url.outputs.url }}
+        run: curl --max-time 300 ${{ steps.application_url.outputs.url }}
 
