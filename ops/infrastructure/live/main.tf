@@ -31,6 +31,7 @@ resource "aws_ecr_repository" "repo" {
 
 resource "aws_security_group" "cluster_access" {
   name_prefix = "${var.name}-eks-access-"
+  vpc_id = local.global_config.vpc_id
 
   ingress {
     from_port       = 80

@@ -152,7 +152,7 @@ jobs:
 
       - name: Get Application URL
         id: application_url
-        run: echo "::set-output url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname})'
+        run: echo "::set-output name=url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname})'
 
       - name: Test deployment
         run: curl ${{ steps.application_url.outputs.url }}
