@@ -156,7 +156,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -backend-config="key=assignment-cats-shop/pr-${PULL_REQUEST_ID}.tfstate"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="id=${PULL_REQUEST_ID}"
