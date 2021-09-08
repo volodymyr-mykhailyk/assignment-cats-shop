@@ -164,7 +164,9 @@ jobs:
       - name: Save Results To Artifacts
         run: |
           mkdir outputs
-          terraform-bin output -raw name > outputs/name.txt
+          terraform-bin output -raw namespace > outputs/namespace.txt
+          terraform-bin output -raw database_url > outputs/database_url.txt
+          terraform-bin output -raw eks_cluster_name > outputs/eks_cluster_name.txt
 
       - name: Store infrastructure information
         uses: actions/upload-artifact@v2
@@ -172,3 +174,42 @@ jobs:
           name: infrastructure
           path: ops/infrastructure/live/outputs/
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ infrastructure, build ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Get Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Configure environment
+        run: |
+          echo "DOCKER_IMAGE=$(<artifacts/build/docker_image.txt)" >> $GITHUB_ENV
+          echo "K8S_NAMESPACE=$(<artifacts/infrastructure/namespace.txt)" >> $GITHUB_ENV
+          echo "DATABASE_URL=$(<artifacts/infrastructure/database_url.txt)" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=$(<artifacts/infrastructure/eks_cluster_name.txt)" >> $GITHUB_ENV
+
+      - name: Configure AWS client
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to cluster
+        run: aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+
+      - name: Deploy Application
+        working-directory: ops/deployment
+        run: bash deploy ${K8S_NAMESPACE} ${DOCKER_IMAGE} ${DATABASE_URL}
+
+      - name: Get Application URL
+        id: application_url
+        run: echo "::set-output name=url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+
+      - name: Test deployment
+        run: curl ${{ steps.application_url.outputs.url }}
