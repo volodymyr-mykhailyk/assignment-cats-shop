@@ -66,7 +66,7 @@ module "eks" {
   name   = var.name
   vpc    = local.global_config
 
-  instances_count       = 3
+  instances_count       = 4
   instances_type        = "t2.micro"
   cluster_access_groups = [aws_security_group.cluster_access.id]
 }
