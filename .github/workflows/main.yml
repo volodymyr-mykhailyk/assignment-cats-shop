@@ -157,6 +157,6 @@ jobs:
       - name: Test deployment
         run: |
           APPLICATION_URL="${{ steps.get_application_url.outputs.url }}"
-          sh ops/scripts/wait_for_url ${APPLICATION_URL}
+          sh ops/scripts/wait_for_url.sh ${APPLICATION_URL}
           curl ${APPLICATION_URL}
 

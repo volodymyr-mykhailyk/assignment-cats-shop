@@ -1,20 +1,29 @@
-name: cleanup
+name: pr-cleanup
 on:
-  schedule:
-    - cron:  '0 19 * * *'
   workflow_dispatch:
+    inputs:
+      pr_id:
+        description: 'Pull Request ID'
+        required: true
+
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  PULL_REQUEST_ID: pr-${{ github.event.number || github.event.inputs.pr_id }}
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ops/infrastructure/live
+        working-directory: ops/infrastructure/pull-request
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -26,10 +35,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -backend-config="key=assignment-cats-shop/${PULL_REQUEST_ID}.tfstate"
 
       - name: Terraform Apply
-        run: terraform destroy -auto-approve
-
-      - name: Clean Remaining Load Balancers
-        run: aws elb describe-load-balancers | jq '.LoadBalancerDescriptions | .[] | .LoadBalancerName' | xargs -L1 aws elb delete-load-balancer --load-balancer-name
+        run: terraform destroy -auto-approve -var="id=${PULL_REQUEST_ID}"
