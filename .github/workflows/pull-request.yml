@@ -208,13 +208,14 @@ jobs:
         run: bash deploy ${K8S_NAMESPACE} ${DOCKER_IMAGE} ${DATABASE_URL}
 
       - name: Get Application URL
-        id: application_url
+        id: get_application_url
         run: echo "::set-output name=url::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
       - name: Test deployment
         run: |
-          sleep 60
-          curl --max-time 300 ${{ steps.application_url.outputs.url }}
+          APPLICATION_URL="${{ steps.get_application_url.outputs.url }}"
+          sh ops/scripts/wait_for_url.sh ${APPLICATION_URL}
+          curl ${APPLICATION_URL}
 
       - uses: actions/github-script@0.9.0
         with:
