@@ -37,5 +37,5 @@ jobs:
         id: init
         run: terraform init -backend-config="key=assignment-cats-shop/${PULL_REQUEST_ID}.tfstate"
 
-      - name: Terraform Apply
+      - name: Terraform Destroy
         run: terraform destroy -auto-approve -var="id=${PULL_REQUEST_ID}"

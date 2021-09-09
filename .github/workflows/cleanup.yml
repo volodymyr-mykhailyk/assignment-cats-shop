@@ -28,7 +28,7 @@ jobs:
         id: init
         run: terraform init
 
-      - name: Terraform Apply
+      - name: Terraform Destroy
         run: terraform destroy -auto-approve
 
       - name: Clean Remaining Load Balancers
