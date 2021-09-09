@@ -222,7 +222,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Application Deployed 🖌.
-            [${{ steps.application_url.outputs.url }}](${{ steps.application_url.outputs.url }})`
+            [${{ steps.get_application_url.outputs.url }}](${{ steps.get_application_url.outputs.url }})`
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
