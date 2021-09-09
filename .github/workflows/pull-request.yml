@@ -43,7 +43,6 @@ jobs:
         continue-on-error: true
 
       - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -210,9 +209,22 @@ jobs:
 
       - name: Get Application URL
         id: application_url
-        run: |
-          echo "::set-output name=domain::$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')"
-          echo "::set-output name=port::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.spec.ports[0].nodePort}')"
+        run: echo "::set-output name=url::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
       - name: Test deployment
-        run: curl --max-time 300 ${{ steps.application_url.outputs.domain }}:${{ steps.application_url.outputs.port }}
+        run: |
+          sleep 60
+          curl --max-time 300 ${{ steps.application_url.outputs.url }}
+
+      - uses: actions/github-script@0.9.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Application Deployed 🖌.
+            [${{ steps.application_url.outputs.url }}](${{ steps.application_url.outputs.url }})`
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
