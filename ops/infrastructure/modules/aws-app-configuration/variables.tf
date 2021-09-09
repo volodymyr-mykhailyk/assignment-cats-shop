@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "vpc" {
-  type        = object({
+  type = object({
     vpc_id     = string
     subnet_ids = list(string)
   })
@@ -18,8 +18,8 @@ variable "database_url" {
 
 variable "ssh_key" {
   type = object({
-    public_key_pem: string
-    public_key_openssh: string
+    public_key_pem : string
+    public_key_openssh : string
   })
   description = "SSH Key used to connect to the instance"
 }

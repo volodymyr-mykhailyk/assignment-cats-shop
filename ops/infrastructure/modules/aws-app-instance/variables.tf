@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "vpc" {
-  type        = object({
+  type = object({
     vpc_id     = string
     subnet_ids = list(string)
   })
@@ -12,7 +12,7 @@ variable "vpc" {
 }
 
 variable "app_configuration" {
-  type        = object({
+  type = object({
     id                           = string
     version                      = string
     connection_security_group_id = string

@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "vpc" {
-  type        = object({
+  type = object({
     vpc_id     = string
     subnet_ids = list(string)
   })
@@ -24,7 +24,7 @@ variable "instances_type" {
 }
 
 variable "cluster_access_groups" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "EKS cluster security groups"
 }

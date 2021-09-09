@@ -7,7 +7,7 @@ output "eks_cluster_name" {
 }
 
 output "eks_cluster_certificate" {
-  value = module.eks.cluster_ca_certificate
+  value     = module.eks.cluster_ca_certificate
   sensitive = true
 }
 

@@ -12,14 +12,14 @@ data "aws_availability_zones" "all" {
 module "vpc" {
   source = "../modules/aws-vpc"
 
-  name       = var.name
-  cidr_block = var.vpc_cidr
+  name               = var.name
+  cidr_block         = var.vpc_cidr
   availability_zones = reverse(data.aws_availability_zones.all.names)
 }
 
 resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
-  name = "terraform-state-lock"
-  hash_key = "LockID"
+  name         = "terraform-state-lock"
+  hash_key     = "LockID"
   billing_mode = "PAY_PER_REQUEST"
 
   attribute {

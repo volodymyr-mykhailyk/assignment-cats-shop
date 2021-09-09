@@ -8,7 +8,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  PULL_REQUEST_ID: ${{ github.event.number }}
+  PULL_REQUEST_ID: pr-${{ github.event.number }}
 
 jobs:
   infrastructure-check:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Terraform Format
         id: fmt
-        run: terraform fmt -check
+        run: terraform fmt -check -diff
 
       - name: Terraform Init
         id: init
@@ -43,7 +43,6 @@ jobs:
         continue-on-error: true
 
       - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -119,6 +118,28 @@ jobs:
           RACK_ENV: test
         run: bundle exec rspec
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: cats-shop
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo ${PULL_REQUEST_ID} > REVISION
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          mkdir outputs
+          echo "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > outputs/docker_image.txt
+
+      - name: Store build information
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: outputs
+
   infrastructure:
     runs-on: ubuntu-latest
     defaults:
@@ -135,7 +156,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -backend-config="key=assignment-cats-shop/${PULL_REQUEST_ID}.tfstate"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="id=${PULL_REQUEST_ID}"
@@ -143,11 +164,68 @@ jobs:
       - name: Save Results To Artifacts
         run: |
           mkdir outputs
-          terraform-bin output -raw name > outputs/name.txt
+          terraform-bin output -raw namespace > outputs/namespace.txt
+          terraform-bin output -raw database_url > outputs/database_url.txt
+          terraform-bin output -raw eks_cluster_name > outputs/eks_cluster_name.txt
 
       - name: Store infrastructure information
         uses: actions/upload-artifact@v2
         with:
           name: infrastructure
-          path: ops/infrastructure/live/outputs/
+          path: ops/infrastructure/pull-request/outputs/
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ infrastructure, build ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Get Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Configure environment
+        run: |
+          echo "DOCKER_IMAGE=$(<artifacts/build/docker_image.txt)" >> $GITHUB_ENV
+          echo "K8S_NAMESPACE=$(<artifacts/infrastructure/namespace.txt)" >> $GITHUB_ENV
+          echo "DATABASE_URL=$(<artifacts/infrastructure/database_url.txt)" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=$(<artifacts/infrastructure/eks_cluster_name.txt)" >> $GITHUB_ENV
+
+      - name: Configure AWS client
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to cluster
+        run: aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+
+      - name: Deploy Application
+        working-directory: ops/deployment
+        run: bash deploy ${K8S_NAMESPACE} ${DOCKER_IMAGE} ${DATABASE_URL}
+
+      - name: Get Application URL
+        id: get_application_url
+        run: echo "::set-output name=url::$(kubectl get services -n ${K8S_NAMESPACE} cats-shop-${K8S_NAMESPACE} --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+
+      - name: Test deployment
+        run: |
+          APPLICATION_URL="${{ steps.get_application_url.outputs.url }}"
+          sh ops/scripts/wait_for_url.sh ${APPLICATION_URL}
+          curl ${APPLICATION_URL}
+
+      - uses: actions/github-script@0.9.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Application Deployed 🖌.
+            [${{ steps.application_url.outputs.url }}](${{ steps.application_url.outputs.url }})`
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })

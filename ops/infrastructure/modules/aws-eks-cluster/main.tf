@@ -3,7 +3,7 @@ resource "aws_eks_cluster" "cluster" {
   role_arn = aws_iam_role.cluster.arn
 
   vpc_config {
-    subnet_ids = var.vpc.subnet_ids
+    subnet_ids         = var.vpc.subnet_ids
     security_group_ids = var.cluster_access_groups
   }
 
@@ -16,14 +16,14 @@ resource "aws_iam_role" "cluster" {
   name = "eks-cluster-role"
 
   assume_role_policy = jsonencode({
-    "Version"   = "2012-10-17",
+    "Version" = "2012-10-17",
     "Statement" = [
       {
-        Effect    = "Allow",
+        Effect = "Allow",
         Principal = {
           Service = "eks.amazonaws.com"
         },
-        Action    = "sts:AssumeRole"
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -63,13 +63,13 @@ resource "aws_iam_role" "nodes" {
 
   assume_role_policy = jsonencode({
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "ec2.amazonaws.com"
       }
     }]
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
   })
 }
 

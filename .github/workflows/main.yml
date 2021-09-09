@@ -105,6 +105,7 @@ jobs:
           ECR_REPOSITORY: cats-shop
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "live:$(git rev-parse --short HEAD)" > REVISION
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           mkdir outputs
@@ -150,9 +151,12 @@ jobs:
         run: bash deploy default ${DOCKER_IMAGE} ${DATABASE_URL}
 
       - name: Get Application URL
-        id: application_url
+        id: get_application_url
         run: echo "::set-output name=url::$(kubectl get services cats-shop-default --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
       - name: Test deployment
-        run: curl --max-time 300 ${{ steps.application_url.outputs.url }}
+        run: |
+          APPLICATION_URL="${{ steps.get_application_url.outputs.url }}"
+          sh ops/scripts/wait_for_url ${APPLICATION_URL}
+          curl ${APPLICATION_URL}
 

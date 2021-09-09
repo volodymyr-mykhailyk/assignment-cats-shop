@@ -32,6 +32,14 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-app-config
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.port }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.port }}
         resources:
 {{ toYaml .Values.app.resources | indent 10 }}
 ---
